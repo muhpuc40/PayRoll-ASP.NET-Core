@@ -1,52 +1,39 @@
-﻿# Payroll Management System API Documentation
+﻿# 💼 Payroll Management System API
 
-A comprehensive payroll management system API built with .NET Core. This system handles employee management, attendance tracking, salary calculations, allowances, bonuses, deductions, and payslip generation.
+> A comprehensive payroll management REST API built with **.NET Core 8**, handling employee management, attendance tracking, salary calculations, and payslip generation.
+
+![.NET](https://img.shields.io/badge/.NET_Core-8.0+-512BD4?style=flat&logo=dotnet&logoColor=white)
+![EF Core](https://img.shields.io/badge/EF_Core-8.0+-512BD4?style=flat&logo=dotnet&logoColor=white)
+![SQL Server](https://img.shields.io/badge/SQL_Server-2019+-CC2927?style=flat&logo=microsoftsqlserver&logoColor=white)
+![Swagger](https://img.shields.io/badge/Swagger-OpenAPI_3.0-85EA2D?style=flat&logo=swagger&logoColor=black)
+![JWT](https://img.shields.io/badge/Auth-JWT_Bearer-000000?style=flat&logo=jsonwebtokens&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat)
+
+---
 
 ## 📋 Table of Contents
 
 - [Features](#features)
-- [Technology Stack](#technology-stack)
 - [Getting Started](#getting-started)
 - [Authentication](#authentication)
 - [API Endpoints](#api-endpoints)
-  - [Auth](#auth)
-  - [Employee](#employee)
-  - [Department](#department)
-  - [Attendance](#attendance)
-  - [Allowance](#allowance)
-  - [Bonus](#bonus)
-  - [Deduction](#deduction)
-  - [Salary Rule](#salary-rule)
-  - [Payslip](#payslip)
-- [Data Models](#data-models)
-- [Enums](#enums)
 - [Security](#security)
 
 ---
 
-## 🚀 Features
+## ✨ Features
 
-- **Employee Management**: CRUD operations for employee records
-- **Department Management**: Organize employees by departments with base salaries
-- **Attendance Tracking**: Record daily attendance with Present/Absent/Late status
-- **Allowance Management**: Configure global, department-level, or individual allowances
-- **Bonus Management**: Set up fixed or percentage-based bonuses
-- **Deduction Management**: Define various deduction types
-- **Salary Rules**: Automated penalty calculation based on attendance
-- **Payslip Generation**: Generate individual or bulk payslips with approval workflow
-- **Authentication & Authorization**: JWT-based secure authentication
-
----
-
-## 💻 Technology Stack
-
-| Technology | Version |
-|------------|---------|
-| .NET Core | 8.0+ |
-| Entity Framework Core | 8.0+ |
-| SQL Server | 2019+ |
-| JWT Bearer Authentication | - |
-| Swagger/OpenAPI | 3.0 |
+| Feature | Description |
+|---------|-------------|
+| 👤 Employee Management | Full CRUD for employee records |
+| 🏢 Department Management | Organize employees with department-level base salaries |
+| 📊 Attendance Tracking | Daily records with Present / Absent / Late status |
+| 💰 Allowance Management | Global, department-level, or per-employee allowances |
+| 🎁 Bonus Management | Fixed or percentage-based bonuses |
+| 📉 Deduction Management | Configurable deduction types |
+| 📏 Salary Rules | Automated penalty calculation based on attendance |
+| 📄 Payslip Generation | Individual & bulk payslips with approval workflow |
+| 🔐 Authentication & Authorization | Role-based JWT authentication |
 
 ---
 
@@ -67,7 +54,7 @@ cd payroll-api
 ```
 
 2. **Update database connection string**
-   
+
    Edit `appsettings.json`:
 ```json
 {
@@ -136,8 +123,6 @@ Authorization: Bearer {your_token}
 | POST | `/api/Auth/login` | Authenticate user and get JWT token |
 | PUT | `/api/Auth/change-password` | Change user password |
 
----
-
 ### 👤 Employee
 
 | Method | Endpoint | Description |
@@ -147,22 +132,6 @@ Authorization: Bearer {your_token}
 | POST | `/api/Employee` | Create new employee |
 | PUT | `/api/Employee/{id}` | Update employee |
 | DELETE | `/api/Employee/{id}` | Delete employee |
-
-**Create Employee Request:**
-```json
-{
-  "username": "john.doe",
-  "email": "john@company.com",
-  "firstName": "John",
-  "lastName": "Doe",
-  "phone": "+1234567890",
-  "position": "Software Engineer",
-  "departmentId": 1,
-  "hireDate": "2024-01-15T00:00:00"
-}
-```
-
----
 
 ### 🏢 Department
 
@@ -174,37 +143,16 @@ Authorization: Bearer {your_token}
 | PUT | `/api/Department/{id}` | Update department |
 | DELETE | `/api/Department/{id}` | Delete department |
 
-**Create Department Request:**
-```json
-{
-  "name": "Engineering",
-  "baseSalary": 50000
-}
-```
-
----
-
 ### 📊 Attendance
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/Attendance/{employeeId}` | Get attendance by employee (optional: month, year query params) |
+| GET | `/api/Attendance/{employeeId}` | Get attendance by employee (optional: month, year) |
 | GET | `/api/Attendance/summary/{employeeId}` | Get attendance summary |
 | POST | `/api/Attendance` | Record single attendance |
 | POST | `/api/Attendance/bulk` | Record bulk attendance |
 | PUT | `/api/Attendance/{id}` | Update attendance record |
 | DELETE | `/api/Attendance/{id}` | Delete attendance record |
-
-**Record Attendance Request:**
-```json
-{
-  "employeeId": 1,
-  "date": "2024-03-15T00:00:00",
-  "status": "Present"
-}
-```
-
----
 
 ### 💰 Allowance
 
@@ -216,19 +164,6 @@ Authorization: Bearer {your_token}
 | PUT | `/api/Allowance/{id}` | Update allowance |
 | DELETE | `/api/Allowance/{id}` | Delete allowance |
 
-**Create Allowance Request:**
-```json
-{
-  "name": "Housing Allowance",
-  "amount": 5000,
-  "scope": "Global",
-  "departmentId": null,
-  "employeeId": null
-}
-```
-
----
-
 ### 🎁 Bonus
 
 | Method | Endpoint | Description |
@@ -238,19 +173,6 @@ Authorization: Bearer {your_token}
 | POST | `/api/Bonus` | Create bonus |
 | PUT | `/api/Bonus/{id}` | Update bonus |
 | DELETE | `/api/Bonus/{id}` | Delete bonus |
-
-**Create Bonus Request:**
-```json
-{
-  "name": "Performance Bonus",
-  "type": "Percentage",
-  "value": 10,
-  "scope": "Individual",
-  "employeeId": 1
-}
-```
-
----
 
 ### 📉 Deduction
 
@@ -262,8 +184,6 @@ Authorization: Bearer {your_token}
 | PUT | `/api/Deduction/{id}` | Update deduction |
 | DELETE | `/api/Deduction/{id}` | Delete deduction |
 
----
-
 ### 📏 Salary Rule
 
 | Method | Endpoint | Description |
@@ -274,18 +194,6 @@ Authorization: Bearer {your_token}
 | PUT | `/api/SalaryRule/{id}` | Update salary rule |
 | DELETE | `/api/SalaryRule/{id}` | Delete salary rule |
 | PATCH | `/api/SalaryRule/{id}/toggle` | Toggle rule active status |
-
-**Create Salary Rule Request:**
-```json
-{
-  "name": "Absent Penalty",
-  "conditionType": "Absent",
-  "threshold": 3,
-  "penaltyDays": 1
-}
-```
-
----
 
 ### 📄 Payslip
 
@@ -301,103 +209,6 @@ Authorization: Bearer {your_token}
 | PUT | `/api/Payslip/{id}/pay` | Mark payslip as paid |
 | DELETE | `/api/Payslip/{id}` | Delete payslip |
 
-**Generate Payslip Request:**
-```json
-{
-  "employeeId": 1,
-  "month": 3,
-  "year": 2024
-}
-```
-
----
-
-## 📦 Data Models
-
-### Employee
-| Field | Type | Description |
-|-------|------|-------------|
-| id | int | Primary key |
-| userId | int | Foreign key to User |
-| departmentId | int | Foreign key to Department |
-| firstName | string | Employee first name |
-| lastName | string | Employee last name |
-| email | string | Employee email |
-| phone | string | Contact number |
-| position | string | Job position |
-| hireDate | datetime | Date of joining |
-| isActive | boolean | Active status |
-
-### Department
-| Field | Type | Description |
-|-------|------|-------------|
-| id | int | Primary key |
-| name | string | Department name |
-| baseSalary | decimal | Default base salary |
-| createdAt | datetime | Creation timestamp |
-
-### Attendance
-| Field | Type | Description |
-|-------|------|-------------|
-| id | int | Primary key |
-| employeeId | int | Foreign key to Employee |
-| date | datetime | Attendance date |
-| status | enum | Present/Absent/Late |
-| createdAt | datetime | Record creation time |
-
-### Payslip
-| Field | Type | Description |
-|-------|------|-------------|
-| id | int | Primary key |
-| employeeId | int | Foreign key to Employee |
-| month | int | Month (1-12) |
-| year | int | Year |
-| baseSalary | decimal | Base salary amount |
-| totalAllowances | decimal | Sum of allowances |
-| totalBonuses | decimal | Sum of bonuses |
-| totalDeductions | decimal | Sum of deductions |
-| attendancePenalty | decimal | Penalty amount |
-| netPayable | decimal | Final payable amount |
-| status | enum | Draft/Approved/Paid |
-| generatedAt | datetime | Generation timestamp |
-
----
-
-## 🔢 Enums
-
-### AllowanceScope / BonusScope / DeductionScope
-| Value | Description |
-|-------|-------------|
-| Global | Applies to all employees |
-| Department | Applies to specific department |
-| Individual | Applies to specific employee |
-
-### AttendanceStatus
-| Value | Description |
-|-------|-------------|
-| Present | Employee was present |
-| Absent | Employee was absent |
-| Late | Employee arrived late |
-
-### BonusType
-| Value | Description |
-|-------|-------------|
-| Fixed | Fixed amount |
-| Percentage | Percentage of base salary |
-
-### PayslipStatus
-| Value | Description |
-|-------|-------------|
-| Draft | Generated but not approved |
-| Approved | Approved for payment |
-| Paid | Payment completed |
-
-### RuleConditionType
-| Value | Description |
-|-------|-------------|
-| Absent | Penalty based on absence |
-| Late | Penalty based on late arrivals |
-
 ---
 
 ## 🔒 Security
@@ -409,25 +220,20 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 ### Default Roles
-- **Admin**: Full system access
-- **Manager**: Can manage employees, attendance, and generate payslips
-- **Employee**: View-only access to own data and payslips
+
+| Role | Access |
+|------|--------|
+| Admin | Full system access |
+| Manager | Manage employees, attendance, and generate payslips |
+| Employee | View-only access to own data and payslips |
 
 ---
 
 ## 📝 License
 
-This project is licensed under the MIT License.
-
----
-
-## 👨‍💻 Author
-
-**Minhaj Uddin Hassan**
-- Software Developer Intern
-- Premier University
+MIT License
 
 ---
 
 <p align="center">Built with ❤️ by Minhaj Uddin Hassan</p>
-<p align="center">© 2024 Payroll Management System. All rights reserved.</p>
+<p align="center">© 2026 Payroll Management System. All rights reserved.</p>
