@@ -11,16 +11,6 @@
 
 ---
 
-## 📋 Table of Contents
-
-- [Features](#features)
-- [Getting Started](#getting-started)
-- [Authentication](#authentication)
-- [API Endpoints](#api-endpoints)
-- [Security](#security)
-
----
-
 ## ✨ Features
 
 | Feature | Description |
