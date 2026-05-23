@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PayrollAPI.Data;
 using PayrollAPI.Models;
+using PayrollAPI.Models.DTOs;
 
 namespace PayrollAPI.Controllers;
 
@@ -21,7 +22,7 @@ public class AttendanceController : ControllerBase
     {
         var query = _context.Attendances.Where(a => a.EmployeeId == employeeId);
         if (month.HasValue) query = query.Where(a => a.Date.Month == month.Value);
-        if (year.HasValue)  query = query.Where(a => a.Date.Year  == year.Value);
+        if (year.HasValue) query = query.Where(a => a.Date.Year == year.Value);
 
         return Ok(await query.OrderBy(a => a.Date).ToListAsync());
     }
@@ -39,30 +40,37 @@ public class AttendanceController : ControllerBase
         return Ok(new
         {
             EmployeeId = employeeId,
-            Month = month, Year = year,
+            Month = month,
+            Year = year,
             TotalRecorded = records.Count,
             Present = records.Count(a => a.Status == AttendanceStatus.Present),
-            Absent  = records.Count(a => a.Status == AttendanceStatus.Absent),
-            Late    = records.Count(a => a.Status == AttendanceStatus.Late)
+            Absent = records.Count(a => a.Status == AttendanceStatus.Absent),
+            Late = records.Count(a => a.Status == AttendanceStatus.Late)
         });
     }
 
     // POST: api/attendance  (Admin only)
     [HttpPost]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Add([FromBody] Attendance attendance)
+    public async Task<IActionResult> Add([FromBody] AttendanceDto dto)
     {
-        if (!await _context.Employees.AnyAsync(e => e.Id == attendance.EmployeeId))
+        if (!await _context.Employees.AnyAsync(e => e.Id == dto.EmployeeId))
             return NotFound(new { message = "Employee not found." });
 
         bool exists = await _context.Attendances.AnyAsync(a =>
-            a.EmployeeId == attendance.EmployeeId && a.Date.Date == attendance.Date.Date);
+            a.EmployeeId == dto.EmployeeId && a.Date.Date == dto.Date.Date);
 
         if (exists)
             return BadRequest(new { message = "Attendance already recorded for this date." });
 
-        attendance.Date      = attendance.Date.Date;    // strip time
-        attendance.CreatedAt = DateTime.UtcNow;
+        var attendance = new Attendance
+        {
+            EmployeeId = dto.EmployeeId,
+            Date = dto.Date.Date,
+            Status = dto.Status,
+            CreatedAt = DateTime.UtcNow
+        };
+
         _context.Attendances.Add(attendance);
         await _context.SaveChangesAsync();
         return Ok(attendance);
@@ -71,12 +79,25 @@ public class AttendanceController : ControllerBase
     // POST: api/attendance/bulk  (Admin only)
     [HttpPost("bulk")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> BulkAdd([FromBody] List<Attendance> records)
+    public async Task<IActionResult> BulkAdd([FromBody] List<AttendanceDto> dtos)
     {
-        foreach (var r in records)
+        var records = new List<Attendance>();
+
+        foreach (var dto in dtos)
         {
-            r.Date      = r.Date.Date;
-            r.CreatedAt = DateTime.UtcNow;
+            bool exists = await _context.Attendances.AnyAsync(a =>
+                a.EmployeeId == dto.EmployeeId && a.Date.Date == dto.Date.Date);
+
+            if (exists)
+                return BadRequest(new { message = $"Attendance already recorded for Employee {dto.EmployeeId} on {dto.Date:yyyy-MM-dd}." });
+
+            records.Add(new Attendance
+            {
+                EmployeeId = dto.EmployeeId,
+                Date = dto.Date.Date,
+                Status = dto.Status,
+                CreatedAt = DateTime.UtcNow
+            });
         }
 
         _context.Attendances.AddRange(records);
@@ -87,13 +108,13 @@ public class AttendanceController : ControllerBase
     // PUT: api/attendance/5  (Admin only)
     [HttpPut("{id}")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Update(int id, [FromBody] Attendance input)
+    public async Task<IActionResult> Update(int id, [FromBody] AttendanceDto dto)
     {
         var record = await _context.Attendances.FindAsync(id);
         if (record == null) return NotFound();
 
-        record.Date   = input.Date.Date;
-        record.Status = input.Status;
+        record.Date = dto.Date.Date;
+        record.Status = dto.Status;
         await _context.SaveChangesAsync();
         return Ok(record);
     }
